@@ -1,0 +1,59 @@
+import time
+import pyautogui
+import cv2
+import numpy as np
+
+login_site = "ENTER THE URL OF YOUR LOGIN SCREEN"
+username = "ENTER YOUR USER NAME"
+password = "ENTER YOUR PASSWORD"
+chrome_logo = "FILEPATH TO CHROME LOGO"
+favorite_logo = "FILEPATH TO FAVORITE LOGO"
+
+# Finding and Clicking Chrome
+
+desktop= pyautogui.screenshot()
+img_bgr = np.array(desktop)
+img_bgr = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+img_gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+
+template = cv2.imread(chrome_logo, 0)
+w, h = template.shape[::-1]
+
+res = cv2.matchTemplate(img_gray, template, cv2.TM_CCOEFF_NORMED)
+threshold = 0.95
+loc = np.where(res >= threshold)
+
+for pt in zip(*loc[::-1]):
+    cv2.rectangle(img_bgr, pt, (pt[0]+w, pt[1]+h), (0,255,255), 2)
+    pyautogui.moveTo(pt[0]+w, pt[1]+h)
+    pyautogui.click(pyautogui.position())
+
+
+# click url bar (pic) maybe just wait
+# type in https://portal.ccga.edu/ 
+
+time.sleep(1)
+desktop= pyautogui.screenshot()
+img_bgr = np.array(desktop)
+img_bgr = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+img_gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+
+template = cv2.imread(favorite_logo, 0)
+w, h = template.shape[::-1]
+
+res = cv2.matchTemplate(img_gray, template, cv2.TM_CCOEFF_NORMED)
+threshold = 0.95
+loc = np.where(res >= threshold)
+
+for pt in zip(*loc[::-1]):
+    cv2.rectangle(img_bgr, pt, (pt[0]+w, pt[1]+h), (0,255,255), 2)
+    pyautogui.moveTo(pt[0]-8*w, pt[1]+h/2)
+    pyautogui.click(pyautogui.position())
+    pyautogui.typewrite(login_site)
+    pyautogui.typewrite(["Enter"])
+
+time.sleep(1)
+pyautogui.typewrite(username)
+pyautogui.typewrite(["Tab"])
+pyautogui.typewrite(password)
+pyautogui.typewrite(["Enter"])
